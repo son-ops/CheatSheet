@@ -1,11 +1,10 @@
 # SQLi Error-Based Cheatsheet
 
-## Table of Contents
+## Contents
 - [MySQL](#mysql)
 - [PostgreSQL](#postgresql)
 - [MSSQL](#mssql)
 - [Oracle](#oracle)
-- [SQLite](#sqlite)
 
 ---
 
@@ -61,21 +60,5 @@
 
 ---
 
-## SQLite
 
-| Hàm / kỹ thuật | Cơ chế | Mẫu |
-|---|---|---|
-| `load_extension(path)` | Dùng nhánh lỗi để tạo khác biệt đúng/sai | `CASE WHEN (<boolean_query>) THEN 1 ELSE load_extension(1) END` |
-
----
-
-## Ghi nhớ nhanh
-
-| DBMS | Cơ chế chính |
-|---|---|
-| MySQL | XPath error, parser error, duplicate error |
-| PostgreSQL | Cast/type conversion error |
-| MSSQL | Cast/conversion error, comparison-triggered conversion |
-| Oracle | Package error, XML error, cast error |
-| SQLite | Conditional error qua `load_extension()` |
 

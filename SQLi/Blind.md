@@ -33,7 +33,6 @@
 | MySQL | `IF()` | `IF(<condition>, <true_expr>, <false_expr>)` | Rẽ nhánh nếu điều kiện đúng hoặc sai |
 | MySQL | `CASE WHEN` | `CASE WHEN <condition> THEN <a> ELSE <b> END` | Rẽ nhánh kiểu chuẩn SQL |
 | MySQL | `MAKE_SET()` | `MAKE_SET(<cond>, <value>)` | Trả về giá trị khi điều kiện phù hợp |
-| MySQL | `ELT()` | `ELT(<index>, <a>, <b>, ...)` | Chọn giá trị theo vị trí chỉ số |
 | MSSQL | `IF ... ELSE` | `IF <condition> <true_stmt> ELSE <false_stmt>` | Rẽ nhánh theo điều kiện |
 | MSSQL | `CASE WHEN` | `CASE WHEN <condition> THEN <a> ELSE <b> END` | Rẽ nhánh dạng biểu thức |
 | PostgreSQL | `CASE WHEN` | `CASE WHEN <condition> THEN <a> ELSE <b> END` | Rẽ nhánh theo điều kiện |

@@ -14,12 +14,3 @@
 | PostgreSQL | `EXECUTE` động trong PL/pgSQL | `EXECUTE <dynamic_statement>` | Dùng để dựng câu lệnh động chứa dữ liệu cần exfil rồi chuyển cho `COPY ... TO PROGRAM` hoặc primitive khác. |
 | Oracle | XML / XXE-based primitive | `SELECT <xml_function>(<xml_payload_with_external_entity>) FROM dual` | Lợi dụng XML parser / external entity để ép Oracle gửi request HTTP hoặc DNS tới server ngoài, trong đó hostname/URL có chứa dữ liệu. |
 
-### Ghi nhớ nhanh
-
-| DBMS | Kênh thường gặp | Ý chính |
-|---|---|---|
-| MySQL | SMB / UNC / DNS | Ép server truy cập đường dẫn mạng |
-| MSSQL | SMB / UNC / DNS | Lạm dụng file, trace, backup, extended procedure |
-| PostgreSQL | DNS / OS command | Dùng chương trình ngoài để gửi dữ liệu |
-| Oracle | HTTP / DNS | Lợi dụng XML parser / external entity |
-| SQLite | Rất hạn chế | Không có primitive OOB thực dụng mặc định |

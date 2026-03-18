@@ -6,8 +6,6 @@
 
 ## Version Enumeration Cheatsheet
 
-> Dùng cho truy vấn hợp lệ / quản trị CSDL / học DBMS.
-
 | DBMS | Query |
 |---|---|
 | MySQL | `SELECT VERSION();` / `SELECT @@version;` |
@@ -19,8 +17,6 @@
 ---
 
 ## SQL Comment Cheatsheet
-
-> Dùng để ghi chú trong câu lệnh SQL hoặc bỏ qua phần còn lại của câu truy vấn khi test parser trong môi trường hợp lệ.
 
 | DBMS | Single-line comment | Multi-line comment |
 |---|---|---|
@@ -48,7 +44,7 @@
 |---|---|
 | MySQL | `\|\|` chỉ hoạt động như nối chuỗi khi bật `PIPES_AS_CONCAT` |
 | MSSQL | `\|\|` chỉ có ở bản mới, `+` vẫn phổ biến hơn |
-| SQLite | `concat(...)`, `concat_ws(...)` chỉ có ở bản mới hơn; cách ổn định nhất là `||` |
+| SQLite | `concat(...)`, `concat_ws(...)` chỉ có ở bản mới hơn; cách ổn định nhất là `\|\|` |
 
 ### Ví dụ
 ` SELECT CONCAT('admin', ':', '123'); `/`SELECT 'admin' + ':' + '123';`/`SELECT 'admin' || ':' || '123';`
@@ -68,4 +64,4 @@
 | SQLite | `group_concat(expr)` / `group_concat(expr, '<sep>')` / `string_agg(expr, '<sep>')` |
 
 ### Ví dụ: 
-`SELECT string_agg(username, ':') FROM users;`
+`SELECT string_agg(username, ':') FROM users;` / `SELECT LISTAGG(username, ':') WITHIN GROUP (ORDER BY 1) FROM users;`

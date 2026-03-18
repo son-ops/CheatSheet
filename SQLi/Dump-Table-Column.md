@@ -19,6 +19,7 @@
 
 | DBMS | Query |
 |---|---|
+| MySQL | `SELECT database_name FROM mysql.innodb_table_stats;` |
 | MySQL | `SELECT schema_name FROM information_schema.schemata;` |
 | PostgreSQL | `SELECT datname FROM pg_database;` / `SELECT schema_name FROM information_schema.schemata;` |
 | MSSQL | `SELECT name FROM sys.databases;` / `SELECT name FROM sys.schemas;` |
@@ -31,6 +32,7 @@
 
 | DBMS | Query |
 |---|---|
+| MySQL | `SELECT table_name FROM mysql.innodb_table_stats WHERE database_name = '<database_name>';` |
 | MySQL | `SELECT table_name FROM information_schema.tables WHERE table_schema = '<database_name>';` |
 | PostgreSQL | `SELECT table_name FROM information_schema.tables WHERE table_schema = '<schema_name>';` |
 | MSSQL | `SELECT table_name FROM information_schema.tables WHERE table_schema = '<schema_name>';` / `SELECT table_schema, table_name FROM information_schema.tables WHERE table_type = 'BASE TABLE';` |
