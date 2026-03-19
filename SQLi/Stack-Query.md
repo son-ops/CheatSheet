@@ -1,3 +1,4 @@
+> Khả năng hỗ trợ multi-query phụ thuộc vào DBMS, ngôn ngữ lập trình và driver/API cụ thể
 # PHP
 | DBMS | Driver / API | Multi-query |
 |---|---|---|
@@ -26,6 +27,15 @@
 | Oracle | `oracledb.Cursor.execute()` | Không hỗ trợ |
 
 ---
+
+## Lưu ý:
+với MSSQL, dấu `;` thường được khuyến nghị nhưng không bắt buộc cho đa số T-SQL statements, nên một số stacked query vẫn có thể hoạt động dù không có `;`. Tuy nhiên, không phải mọi cú pháp đều bỏ được `;`.
+
+Ví dụ: 
+- multiple SELECT statements: `SELECT 'A'SELECT 'B'SELECT 'C'`
+
+- updating password with a stacked query: `SELECT id, username, password FROM users WHERE username = 'admin'exec('update[users]set[password]=''a''')--`
+
 
 ## Ví dụ nhanh
 
