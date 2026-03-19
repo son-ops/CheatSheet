@@ -17,15 +17,6 @@
 
 # Loose Comparison
 
-| DBMS | Loose comparison | Ghi chú ngắn |
-|---|---|---|
-| MySQL | Có | So sánh khá “lỏng”; khi chuỗi đem so với số, MySQL có thể **ép kiểu** và nhiều chuỗi khác nhau có thể cùng thành một giá trị số. |
-| MariaDB | Có | Hành vi nhìn chung rất gần MySQL trong các tình huống ép kiểu và so sánh lỏng.|
-| PostgreSQL | Không nổi bật | PostgreSQL chặt hơn; lưu ý các giá trị dài quá `varchar(n)` thường lỗi thay vì “nương tay”, phản ánh cách xử lý kiểu dữ liệu chặt hơn. |
-| SQLite | Có | SQLite dùng **flexible typing / affinity**, nên việc so sánh và chuyển kiểu linh hoạt hơn DBMS chặt kiểu PostgreSQL. |
-
-# Loose Comparison
-
 | DBMS | Loose comparison | Ví dụ tiêu biểu | Ghi chú ngắn |
 |---|---|---|---|
 | MySQL | Có | `'0' = 0` → `TRUE` ; `'0.0' = 0` → `TRUE` ; `'x6' = 0` → `TRUE` ; `7 > '6x'` → `TRUE` | MySQL tự động chuyển chuỗi sang số khi cần; nhiều chuỗi khác nhau có thể cùng bị hiểu thành một giá trị số. |
