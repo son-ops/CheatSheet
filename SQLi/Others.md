@@ -65,3 +65,14 @@
 
 ### Ví dụ: 
 `SELECT string_agg(username, ':') FROM users;` / `SELECT LISTAGG(username, ':') WITHIN GROUP (ORDER BY 1) FROM users;`
+
+---
+
+## Convert Characters to Integers
+| DBMS | Function | Output |
+| ---- | -------- | ------ |
+|MySQL| `ASCII('A')`|65|
+|PostgreSQL|`ASCII('A')`|65|
+|MSSQL|`UNICODE('A')`|65|
+|Oracle|`ASCII('A')`|65|
+|SQLite|`UNICODE('A')`|65|

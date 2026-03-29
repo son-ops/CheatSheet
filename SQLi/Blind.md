@@ -9,34 +9,34 @@
 
 ## Character extraction
 
-| DBMS | Primitive | Syntax khung | Giải thích |
-|---|---|---|---|
-| MySQL | `SUBSTR()` | `SUBSTR(<expr>, <pos>, 1)` | Cắt chuỗi con từ vị trí chỉ định |
-| MySQL | `SUBSTRING()` | `SUBSTRING(<expr>, <pos>, 1)` | Tương đương `SUBSTR()` |
-| MySQL | `MID()` | `MID(<expr>, <pos>, 1)` | Alias của `SUBSTRING()` trong MySQL |
-| MySQL | `LEFT()` | `LEFT(<expr>, <len>)` | Lấy N ký tự từ bên trái |
-| MySQL | `RIGHT()` | `RIGHT(<expr>, <len>)` | Lấy N ký tự từ bên phải |
-| MSSQL | `SUBSTRING()` | `SUBSTRING(<expr>, <pos>, 1)` | Cắt chuỗi con theo vị trí |
-| PostgreSQL | `SUBSTR()` | `SUBSTR(<expr>, <pos>, <len>)` | Cắt chuỗi con |
-| PostgreSQL | `SUBSTRING()` | `SUBSTRING(<expr>, <pos>, <len>)` | Tương đương `SUBSTR()` |
-| PostgreSQL | `SUBSTRING ... FROM ... FOR` | `SUBSTRING(<expr> FROM <pos> FOR <len>)` | Cú pháp chuẩn của PostgreSQL |
-| SQLite | `SUBSTR()` | `SUBSTR(<expr>, <pos>, <len>)` | Cắt chuỗi con |
-| SQLite | `SUBSTRING()` | `SUBSTRING(<expr>, <pos>, <len>)` | Cách viết khác của `SUBSTR()` |
-| Oracle | `SUBSTR()` | `SUBSTR(<expr>, <pos>, <len>)` | Cắt chuỗi con |
+| DBMS | Primitive | Syntax khung |
+|---|---|---|
+| MySQL | `SUBSTR()` | `SUBSTR(<expr>, <pos>, <len>)` |
+| MySQL | `SUBSTRING()` | `SUBSTRING(<expr>, <pos>, <len>)` |
+| MySQL | `MID()` | `MID(<expr>, <pos>, <len>)` |
+| MySQL | `LEFT()` | `LEFT(<expr>, <len>)`  (Lấy N ký tự từ bên trái) | 
+| MySQL | `RIGHT()` | `RIGHT(<expr>, <len>)` (Lấy N ký tự từ bên phải)|
+| MSSQL | `SUBSTRING()` | `SUBSTRING(<expr>, <pos>, <len>)` | 
+| PostgreSQL | `SUBSTR()` | `SUBSTR(<expr>, <pos>, <len>)` | 
+| PostgreSQL | `SUBSTRING()` | `SUBSTRING(<expr>, <pos>, <len>)` | 
+| PostgreSQL | `SUBSTRING ... FROM ... FOR` | `SUBSTRING(<expr> FROM <pos> FOR <len>)` |
+| SQLite | `SUBSTR()` | `SUBSTR(<expr>, <pos>, <len>)` |
+| SQLite | `SUBSTRING()` | `SUBSTRING(<expr>, <pos>, <len>)` | 
+| Oracle | `SUBSTR()` | `SUBSTR(<expr>, <pos>, <len>)` | 
 
 ---
 
 ## Conditional / branching
 
-| DBMS | Primitive | Syntax khung | Giải thích |
-|---|---|---|---|
-| MySQL | `IF()` | `IF(<condition>, <true_expr>, <false_expr>)` | Rẽ nhánh nếu điều kiện đúng hoặc sai |
-| MySQL | `CASE WHEN` | `CASE WHEN <condition> THEN <a> ELSE <b> END` | Rẽ nhánh kiểu chuẩn SQL |
-| MySQL | `MAKE_SET()` | `MAKE_SET(<cond>, <value>)` | Trả về giá trị khi điều kiện phù hợp |
-| MSSQL | `IF ... ELSE` | `IF <condition> <true_stmt> ELSE <false_stmt>` | Rẽ nhánh theo điều kiện |
-| MSSQL | `CASE WHEN` | `CASE WHEN <condition> THEN <a> ELSE <b> END` | Rẽ nhánh dạng biểu thức |
-| PostgreSQL | `CASE WHEN` | `CASE WHEN <condition> THEN <a> ELSE <b> END` | Rẽ nhánh theo điều kiện |
-| Oracle | `CASE WHEN` | `CASE WHEN <condition> THEN <a> ELSE <b> END` | Rẽ nhánh theo điều kiện |
+| DBMS | Primitive | Syntax khung |
+|---|---|---|
+| MySQL | `IF()` | `IF(<condition>, <true_expr>, <false_expr>)` | 
+| MySQL | `CASE WHEN` | `CASE WHEN <condition> THEN <a> ELSE <b> END` |
+| MySQL | `MAKE_SET()` | `MAKE_SET(<cond>, <value>)` | 
+| MSSQL | `IF ... ELSE` | `IF <condition> <true_stmt> ELSE <false_stmt>` | 
+| MSSQL | `CASE WHEN` | `CASE WHEN <condition> THEN <a> ELSE <b> END` | 
+| PostgreSQL | `CASE WHEN` | `CASE WHEN <condition> THEN <a> ELSE <b> END` | 
+| Oracle | `CASE WHEN` | `CASE WHEN <condition> THEN <a> ELSE <b> END` |
 
 ---
 
