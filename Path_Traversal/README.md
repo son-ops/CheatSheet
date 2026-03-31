@@ -407,7 +407,7 @@ if os.path.commonpath([base, candidate]) != base:
   **Dùng khi:** cần biết process được chạy bằng lệnh nào, tham số gì
 
 - `/proc/<pid>/cwd`  
-  **Chứa gì:** current working directory của process  
+  **Chứa:** current working directory của process  
   **Dùng khi:** cần xác định thư mục app đang chạy từ đâu
 
 - `/proc/<pid>/environ`  
@@ -424,7 +424,7 @@ if os.path.commonpath([base, candidate]) != base:
 #### Shell history
 
 - `~/.bash_history`  
-  **Chứa gì:** lịch sử lệnh shell đã chạy  
+  **Chứa:** lịch sử lệnh shell đã chạy  
   **Dùng khi:** cần xem thao tác vận hành gần đây, câu lệnh admin từng dùng  
   **Lưu ý:** có thể vô tình lộ token, password, path nhạy cảm nếu từng gõ trực tiếp
 
