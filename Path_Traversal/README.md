@@ -51,7 +51,7 @@ if ! file_path.startswith(base):
     reject()
 # Cách này an toàn hơn cách trên do đã canonicalize đường dẫn sau đó mới check startswith nhưng vẫn gây rủi ro
 # Trong trường hợp path = '../uploads_xyz/\<xyz\>'
-# Lúc này nó đã mở sang một thư mục khác là uploads_xyz chứ không còn là uploads
+# Lúc này nó đã sang một thư mục khác là uploads_xyz chứ không còn là uploads
 ```
 
 #### 3. Strip replace
@@ -205,10 +205,10 @@ Ngoài ra vẫn còn nhiều dạng Unicode đặc biệt khác.
 - Mẫu kiểm tra an toàn:
 
 ```python
-base = os.path.realpath(BASE)
-candidate = os.path.realpath(os.path.join(base, user_input))
-
-if os.path.commonpath([base, candidate]) != base:
+if os.path.isabs(user_input) or '..' in user_input:
+    reject()
+real_path = os.path.realpath(os.path.join(base, user_input))
+if os.path.commonpath([base, real_path]) != base:
     reject()
 ```
 ---
