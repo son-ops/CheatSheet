@@ -202,15 +202,6 @@ Ngoài ra vẫn còn nhiều dạng Unicode đặc biệt khác.
   - reject path traversal
   - chỉ extract vào thư mục kiểm soát được
 
-- Mẫu kiểm tra an toàn:
-
-```python
-if os.path.isabs(user_input) or '..' in user_input:
-    reject()
-real_path = os.path.realpath(os.path.join(base, user_input))
-if os.path.commonpath([base, real_path]) != base:
-    reject()
-```
 ---
 
 ## Common file path cheatsheet
