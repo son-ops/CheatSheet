@@ -7,6 +7,7 @@
   - [Zip Slip](#zip-slip)
   - [Multi-layer transform mismatch](#multi-layer-transform-mismatch)
   - [Unicode normalization](#unicode-normalization)
+  - [Blind Path Traversal](#Blind-Path-Traversal)
 - [Cách phòng chống](#cách-phòng-chống)
 - [Common file path cheatsheet](#common-file-path-cheatsheet)
   - [Common app path](#common-file-path-cheatsheet)
@@ -177,205 +178,54 @@ Khi xử lí normalize về `NFKC` có thể gây ra việc tạo các kí tự 
 
 Ngoài ra vẫn còn nhiều dạng Unicode đặc biệt khác.
 
+### Blind Path Traversal
+
+https://hackmd.io/@endy/ryjPiwO-h
+
 ---
 
 ## Cách phòng chống
 
 - Không cho user kiểm soát path trực tiếp nếu không thật sự cần.
 - Dùng allowlist / ID mapping thay vì nhận path raw từ input.
-
-- Thứ tự xử lí an toàn:
-  - decode
-  - normalize
-  - canonicalize / resolve
-  - validate trên giá trị cuối cùng
-  - file access
-
-- Không tin vào:
-  - blacklist `..`
-  - strip / replace
-  - `startswith()`
-  - check prefix kiểu string
-
+- Canonicalize path và check xem nó có nằm trong thư mục được phép không
 - Với zip/tar:
   - validate từng entry
   - reject path traversal
   - chỉ extract vào thư mục kiểm soát được
 
-- Mẫu kiểm tra an toàn:
-
-```python
-base = os.path.realpath(BASE)
-candidate = os.path.realpath(os.path.join(base, user_input))
-
-if os.path.commonpath([base, candidate]) != base:
-    reject()
-```
 ---
 
 ## Common file path cheatsheet
 
-### PHP (thuần)
+### Stacks
 
-#### Document root
+#### Document Root
 - `/var/www/html/index.php`
 - `/var/www/<project>/index.php`
 - `/var/www/<project>/public/index.php`
-
-#### Log file
-- `/var/log/apache2/access.log`
-- `/var/log/apache2/error.log`
-- `/var/log/nginx/access.log`
-- `/var/log/nginx/error.log`
-- `/var/log/php-fpm.log`
-
-#### Env file
-- `/var/www/<project>/.env`
-- `/etc/environment`
-- `/etc/default/<service>`
-
-#### Config file
-- `/etc/nginx/nginx.conf`
-- `/etc/nginx/sites-available/<site>.conf`
-- `/etc/apache2/apache2.conf`
-- `/etc/apache2/sites-available/<site>.conf`
-- `/etc/php/<version>/fpm/php.ini`
-
----
-
-### Laravel
-
-#### Document root / entry file
-- `/var/www/<project>/public/index.php`
-
-#### Log file
-- `/var/www/<project>/storage/logs/laravel.log`
-
-#### Env file
-- `/var/www/<project>/.env`
-
-#### Config file
-- `/var/www/<project>/config/app.php`
-- `/var/www/<project>/config/database.php`
-- `/var/www/<project>/config/queue.php`
-
----
-
-### Symfony
-
-#### Document root
-- `/var/www/<project>/public/index.php`
-
-#### Log file
-- `/var/www/<project>/var/log/dev.log`
-- `/var/www/<project>/var/log/prod.log`
-
-#### Env file
-- `/var/www/<project>/.env`
-- `/var/www/<project>/.env.local`
-
-#### Config file
-- `/var/www/<project>/config/services.yaml`
-- `/var/www/<project>/config/routes.yaml`
-
----
-
-### WordPress
-
-#### Document root
-- `/var/www/html/index.php`
 - `/var/www/html/wp-blog-header.php`
-
-#### Log file
-- `/var/www/html/wp-content/debug.log`
-- `/var/log/nginx/error.log`
-- `/var/log/apache2/error.log`
-
-#### Env file
-- `/var/www/html/wp-config.php`
-
-#### Config file
-- `/var/www/html/wp-config.php`
-- `/var/www/html/.htaccess`
-
----
-
-### Flask
-
-#### Entry file
+- `/app/app.js`
+- `/app/server.js`
+- `/app/index.js`
 - `/app/app.py`
 - `/app/wsgi.py`
-
-#### Log file
-- `/app/logs/app.log`
-- `/var/log/gunicorn/error.log`
-
-#### Env file
-- `/app/.env`
-- `/app/.flaskenv`
-
-#### Config file
-- `/app/config.py`
-- `/app/instance/config.py`
-
----
-
-### Django
-
-#### Entry file
 - `/app/manage.py`
 - `/app/<project>/wsgi.py`
 - `/app/<project>/asgi.py`
 
-#### Log file
-- `/app/logs/django.log`
-- `/var/log/gunicorn/error.log`
-
-#### Env file
-- `/app/.env`
-
 #### Config file
-- `/app/<project>/settings.py`
-- `/app/<project>/urls.py`
-
----
-
-### Node.js (thuần)
-
-#### Entry file
-- `/app/app.js`
-- `/app/server.js`
-- `/app/index.js`
-
-#### Log file
-- `/app/logs/app.log`
-
-#### Env file
-- `/app/.env`
-- `/app/.env.production`
-
-#### Config file
-- `/app/package.json`
-- `/app/ecosystem.config.js`
-
----
-
-### Express
-
-#### Entry file
-- `/app/app.js`
-- `/app/server.js`
-
-#### Log file
-- `/app/logs/app.log`
-
-#### Env file
-- `/app/.env`
-
-#### Config file
-- `/app/package.json`
-- `/app/ecosystem.config.js`
-
+- `/usr/local/apache2/conf/httpd.conf`
+- `/usr/local/etc/apache2/httpd.conf`
+- `/usr/local/nginx/conf/nginx.conf`
+- `/etc/apache2/sites-available/000-default.conf`
+- `/etc/apache2/apache2.conf`
+- `/etc/apache2/httpd.conf`
+- `/etc/httpd/conf/httpd.conf`
+- `/etc/nginx/conf.d/default.conf`
+- `/etc/nginx/nginx.conf`
+- `/etc/nginx/sites-enabled/default`
+- `/etc/nginx/sites-enabled/default.conf`
 ---
 
 ### Linux path
@@ -441,3 +291,4 @@ Update later
 ## References
 
 - `https://medium.com/@jeroenverhaeghe/advanced-directory-traversal-attacks-against-linux-6a9a7ab27766`
+- `https://www.synacktiv.com/en/publications/php-filter-chains-file-read-from-error-based-oracle.html`
