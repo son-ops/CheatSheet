@@ -1,5 +1,19 @@
 # File Inclusion
 
+## Mục lục
+
+- [Methodology](#methodology)
+    - [LFI via Upload File](#lfi-kết-hợp-với-chức-năng-upload-file)
+    - [LFI via Log File / Session File / Pearcmd File](#lfi-qua-log-file--session-file--pearcmd-file)
+        - [Via Log File](#via-log-file)
+        - [Via Session File](#via-session)
+        - [Via Pearcmd File](#via-pearcmdphp--url-args)
+    - [LFI via PHP Filter Chain](#turn-any-lfi-to-rce-với-php-filter)
+    - [Remote File Inclusion](#remote-file-inclusion)
+    - [Others](#others)
+- [Prevention](#cách-phòng-chống)
+- [References](#references)
+
 File Inclusion là lỗ hổng xảy ra khi dữ liệu không tin cậy từ người dùng được đưa vào các hàm nạp file, ví dụ như `include`, `require`, `include_once`, `require_once` trong PHP.
 
 Các hàm này sẽ nạp nội dung của file được truyền vào. Nếu file đó chứa mã PHP hợp lệ, ví dụ `<?php ... ?>`, mã PHP sẽ được phân tích và thực thi bởi server.
